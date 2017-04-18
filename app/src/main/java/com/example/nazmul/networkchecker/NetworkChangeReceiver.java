@@ -5,21 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 public class NetworkChangeReceiver extends BroadcastReceiver {
     private Context mContext;
-    private boolean mIsConnected = false;
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
         this.mContext = context;
+        Toast.makeText(context, "Status changed", Toast.LENGTH_SHORT).show();
 
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        mIsConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        if (mIsConnected) {
+        if (checkConnection(mContext)) {
             App.get().bus().send("True");
 
         } else {
@@ -27,6 +23,13 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
         }
 
+    }
+
+    public static boolean checkConnection(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean mIsConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return mIsConnected;
     }
 
 }
